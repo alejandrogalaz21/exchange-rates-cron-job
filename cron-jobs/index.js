@@ -3,6 +3,7 @@ const moment = require('moment')
 const fetch = require('node-fetch')
 const os = require("os")
 const emoji = require('node-emoji')
+const cron = require("node-cron")
 
 
 
@@ -31,10 +32,10 @@ const emoji = require('node-emoji')
 
     const item = {USD, EUR, GBP, CreatedDate, Active}
 
-    const data = `\ ${dateLog} - Exchange Rates USD: ${USD} , EUR: ${EUR}, GBP: ${GBP}`
+    const data = `${dateLog} - Exchange Rates USD: ${USD} , EUR: ${EUR}, GBP: ${GBP}  - ${emoji.get('thumbsup')}`
     
     
-    fs.writeFile('cron-jobs.txt', data + os.EOL, {'flag':'a'}, function(err, data){
+    fs.writeFileSync('cron-jobs.txt', data + os.EOL, {'flag':'a'}, function(err, data){
       if (err) console.log(err)
       console.log("Successfully Written to File.")
     }) 
@@ -43,11 +44,11 @@ const emoji = require('node-emoji')
 
   } catch (error) {
 
-    const data = `${dateLog} - Error al querer obtener Exanges Rates`
+    const data = `${dateLog} - Error al querer obtener Exanges Rates - ${emoji.get('white_frowning_face')}`
   
-    fs.writeFile('cron-jobs.txt', data + os.EOL, function(err, data){
+    fs.writeFileSync('cron-jobs.txt', data + os.EOL, function(err, data){
       if (err) console.log(err)
-      console.log("Successfully Written to File.")
+      console.log("Writte ERROR to File.")
     }) 
   
   }
@@ -56,4 +57,28 @@ const emoji = require('node-emoji')
 
 const dateLog = moment().format('MMMM Do YYYY, h:mm:ss a')
 
-getRates(dateLog)
+
+// schedule tasks to be run on the server
+// * * * * * *
+// | | | | | |
+// | | | | | day of week
+// | | | | month
+// | | | day of month
+// | | hour
+// | minute
+// second ( optional )
+// update at 11:59pm every day
+// 59 23 * * * 
+cron.schedule("* * * * *", function() { 
+  
+  console.log(`${emoji.get('gem')} - Cron Job Excecute at ${dateLog} - ${emoji.get('gem')}`)
+
+  const data = `${emoji.get('gem')} - Cron Job Excecute at ${dateLog} - ${emoji.get('gem')}`
+
+  fs.writeFileSync('cron-jobs.txt', data + os.EOL, {'flag':'a'}, function(err, data){
+    if (err) console.log(err)
+  }) 
+  
+  getRates(dateLog)
+})
+
